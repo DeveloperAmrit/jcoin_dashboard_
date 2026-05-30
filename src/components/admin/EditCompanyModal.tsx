@@ -27,8 +27,8 @@ export default function EditCompanyModal({ company }: { company: Company }) {
     try {
       await editCompany(company.id, formData);
       setIsOpen(false);
-    } catch (err: any) {
-      setError(err.message || 'Failed to edit company');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to edit company');
     } finally {
       setIsLoading(false);
     }

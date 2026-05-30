@@ -1,5 +1,12 @@
 import { supabase } from '@/lib/supabase';
 import AddCompanyModal from '@/components/admin/AddCompanyModal';
+interface CompanyWithMoU {
+  id: string;
+  name: string;
+  agreement_start_date: string | null;
+  agreement_end_date: string | null;
+  mou_documents: { status: string }[] | null;
+}
 
 export const revalidate = 0;
 
@@ -35,7 +42,7 @@ export default async function AdminMoU() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-sm">
-            {companies?.map((company: any) => {
+            {companies?.map((company: CompanyWithMoU) => {
               // Assume the latest MoU document is the first one if multiple exist, or just check [0]
               const mouStatus = company.mou_documents?.[0]?.status || 'Not Submitted';
               const statusDisplay = mouStatus.replace('_', ' ');

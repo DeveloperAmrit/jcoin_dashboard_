@@ -1,6 +1,15 @@
 import { supabase } from '@/lib/supabase';
-import SubmitActivityModal from '@/components/company/SubmitActivityModal';
 import { getUserRoleAndData } from '@/lib/auth';
+
+interface LedgerEntry {
+  id: string;
+  date: string;
+  description: string;
+  status: string;
+  coins_earned: number | null;
+  coins_used: number | null;
+  jcoin_rules: { activity_name: string } | null;
+}
 
 export const revalidate = 0;
 
@@ -25,13 +34,15 @@ export default async function CompanyLedger() {
 
   let runningBalance = 0;
   
-  // Calculate running balances (assuming chronological processing, so let's reverse to calc)
-  const entriesWithBalance = (ledgerEntries || []).slice().reverse().map(entry => {
+  const entriesWithBalance: (LedgerEntry & { balance: number })[] = [];
+  const reversedEntries = (ledgerEntries || []).slice().reverse() as unknown as LedgerEntry[];
+  for (const entry of reversedEntries) {
     if (entry.status === 'approved') {
       runningBalance += (entry.coins_earned || 0) - (entry.coins_used || 0);
     }
-    return { ...entry, balance: runningBalance };
-  }).reverse(); // Reverse back for display (newest first)
+    entriesWithBalance.push({ ...entry, balance: runningBalance });
+  }
+  entriesWithBalance.reverse(); // Reverse back for display (newest first)
 
   const totalEarned = ledgerEntries?.filter(e => e.status === 'approved').reduce((sum, e) => sum + (e.coins_earned || 0), 0) || 0;
   const totalUsed = ledgerEntries?.filter(e => e.status === 'approved').reduce((sum, e) => sum + (e.coins_used || 0), 0) || 0;
@@ -87,31 +98,31 @@ export default async function CompanyLedger() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-sm">
-            {entriesWithBalance.map((tx: any) => (
-              <tr key={tx.id} className="hover:bg-slate-50 transition-colors">
+            {entriesWithBalance.map((entry) => (
+              <tr key={entry.id} className="hover:bg-slate-50 transition-colors">
                 <td className="p-4 font-medium text-slate-600">
-                  {new Date(tx.date).toLocaleDateString()}
+                  {new Date(entry.date).toLocaleDateString()}
                 </td>
                 <td className="p-4 text-slate-800 font-medium">
-                  {tx.description || tx.jcoin_rules?.activity_name || 'System Action'}
+                  {entry.description || entry.jcoin_rules?.activity_name || 'System Action'}
                 </td>
                 <td className="p-4 text-center">
                   <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                    tx.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
-                    tx.status === 'pending_approval' ? 'bg-amber-100 text-amber-700' :
+                    entry.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
+                    entry.status === 'pending_approval' ? 'bg-amber-100 text-amber-700' :
                     'bg-red-100 text-red-700'
                   }`}>
-                    {tx.status?.replace('_', ' ')}
+                    {entry.status.replace('_', ' ')}
                   </span>
                 </td>
-                <td className="p-4 text-right font-semibold text-emerald-600">
-                  {tx.coins_earned > 0 ? `+${tx.coins_earned.toLocaleString()}` : '-'}
+                <td className="p-4 text-right font-medium text-emerald-600">
+                  {entry.coins_earned ? `+${entry.coins_earned.toLocaleString()}` : '-'}
                 </td>
-                <td className="p-4 text-right font-semibold text-red-500">
-                  {tx.coins_used > 0 ? `-${tx.coins_used.toLocaleString()}` : '-'}
+                <td className="p-4 text-right font-medium text-red-600">
+                  {entry.coins_used ? `-${entry.coins_used.toLocaleString()}` : '-'}
                 </td>
                 <td className="p-4 text-right font-bold text-slate-800">
-                  {tx.status === 'approved' ? tx.balance.toLocaleString() : 'N/A'}
+                  {entry.status === 'approved' ? entry.balance.toLocaleString() : 'N/A'}
                 </td>
               </tr>
             ))}

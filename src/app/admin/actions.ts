@@ -29,7 +29,7 @@ export async function addCompany(formData: FormData) {
 
   // 1. Create User Auth Account
   const defaultPassword = 'CompanyPassword123!';
-  const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+  const { error: authError } = await supabaseAdmin.auth.admin.createUser({
     email: contact_email,
     password: defaultPassword,
     email_confirm: true,

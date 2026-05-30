@@ -1,6 +1,14 @@
 import { supabase } from '@/lib/supabase';
 import AddRuleModal from '@/components/admin/AddRuleModal';
 
+interface Rule {
+  id: string;
+  activity_name: string;
+  points_awarded: number;
+  annual_cap: number | null;
+  validity_months: number | null;
+}
+
 export const revalidate = 0;
 
 export default async function AdminRules() {
@@ -17,7 +25,7 @@ export default async function AdminRules() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {rules?.map((rule: any) => (
+        {rules?.map((rule: Rule) => (
           <div key={rule.id} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
             <div className="flex justify-between items-start mb-4">
               <h3 className="font-bold text-slate-800">{rule.activity_name}</h3>

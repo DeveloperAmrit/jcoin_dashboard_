@@ -1,6 +1,13 @@
 import { supabase } from '@/lib/supabase';
 import ReportsChart from '@/components/admin/ReportsChart';
 
+interface ReportEntry {
+  coins_earned: number | null;
+  coins_used: number | null;
+  companies: { name: string } | null;
+  jcoin_rules: { activity_name: string } | null;
+}
+
 export const revalidate = 0;
 
 export default async function AdminReports() {
@@ -15,7 +22,7 @@ export default async function AdminReports() {
     `)
     .eq('status', 'approved');
 
-  const entries = ledgerEntries || [];
+  const entries = (ledgerEntries || []) as unknown as ReportEntry[];
 
   // Aggregate Data: Total Metrics
   const totalEarned = entries.reduce((sum, e) => sum + (e.coins_earned || 0), 0);
@@ -24,7 +31,7 @@ export default async function AdminReports() {
   // Aggregate Data: Top Companies
   const companyMap = new Map();
   entries.forEach((e) => {
-    if (e.coins_earned > 0 && e.companies?.name) {
+    if (e.coins_earned && e.coins_earned > 0 && e.companies?.name) {
       const name = e.companies.name;
       companyMap.set(name, (companyMap.get(name) || 0) + e.coins_earned);
     }
@@ -38,7 +45,7 @@ export default async function AdminReports() {
   // Aggregate Data: By Activity Rule
   const activityMap = new Map();
   entries.forEach((e) => {
-    if (e.coins_earned > 0) {
+    if (e.coins_earned && e.coins_earned > 0) {
       const name = e.jcoin_rules?.activity_name || 'Other / System';
       activityMap.set(name, (activityMap.get(name) || 0) + e.coins_earned);
     }

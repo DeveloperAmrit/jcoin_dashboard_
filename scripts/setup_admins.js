@@ -34,7 +34,7 @@ async function setupAdmins() {
 
     console.log(`Creating user for: ${email}`);
 
-    const { data, error } = await supabase.auth.admin.createUser({
+    const { error } = await supabase.auth.admin.createUser({
       email,
       password,
       email_confirm: true,

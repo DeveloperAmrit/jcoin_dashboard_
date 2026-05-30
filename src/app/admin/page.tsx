@@ -1,4 +1,11 @@
 import { supabase } from '@/lib/supabase';
+interface Activity {
+  id: string;
+  date: string;
+  description: string;
+  created_at: string;
+  companies: { name: string } | null;
+}
 
 export const revalidate = 0; // Disable cache for dashboard
 
@@ -42,6 +49,8 @@ export default async function AdminDashboard() {
     { label: 'System Status', value: 'Active', trend: 'Operational' },
   ];
 
+  const activities = (recentActivity || []) as unknown as Activity[];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -77,8 +86,8 @@ export default async function AdminDashboard() {
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 min-h-[400px]">
           <h2 className="text-lg font-bold text-slate-800 mb-4">Recent Activity</h2>
           <div className="space-y-4">
-            {recentActivity && recentActivity.length > 0 ? (
-              recentActivity.map((activity: any) => (
+            {activities.length > 0 ? (
+              activities.map((activity: Activity) => (
                 <div key={activity.id} className="flex gap-4 items-start border-b border-slate-50 pb-4 last:border-0">
                   <div className="w-2 h-2 mt-2 rounded-full bg-blue-500"></div>
                   <div>

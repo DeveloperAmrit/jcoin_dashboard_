@@ -17,8 +17,8 @@ export default function AddRuleModal() {
     try {
       await addRule(formData);
       setIsOpen(false);
-    } catch (err: any) {
-      setError(err.message || 'Failed to add rule');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to add rule');
     } finally {
       setIsLoading(false);
     }

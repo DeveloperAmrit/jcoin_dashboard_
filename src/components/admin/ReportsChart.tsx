@@ -6,8 +6,8 @@ import {
 } from 'recharts';
 
 interface ChartProps {
-  companyData: any[];
-  activityData: any[];
+  companyData: { name: string; totalEarned: number }[];
+  activityData: { name: string; value: number }[];
 }
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];

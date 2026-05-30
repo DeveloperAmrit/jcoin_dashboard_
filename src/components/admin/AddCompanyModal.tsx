@@ -17,8 +17,8 @@ export default function AddCompanyModal() {
     try {
       await addCompany(formData);
       setIsOpen(false);
-    } catch (err: any) {
-      setError(err.message || 'Failed to add company');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to add company');
     } finally {
       setIsLoading(false);
     }

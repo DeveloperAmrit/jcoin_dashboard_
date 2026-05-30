@@ -2,6 +2,16 @@ import { supabase } from '@/lib/supabase';
 import AddCompanyModal from '@/components/admin/AddCompanyModal';
 import CompanyActions from '@/components/admin/CompanyActions';
 
+interface Company {
+  id: string;
+  name: string;
+  contact_person: string;
+  contact_email: string;
+  min_annual_jcoin_target: number;
+  agreement_start_date: string | null;
+  agreement_end_date: string | null;
+}
+
 export const revalidate = 0;
 
 export default async function AdminCompanies() {
@@ -29,7 +39,7 @@ export default async function AdminCompanies() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-sm">
-            {companies?.map((company: any) => (
+            {companies?.map((company: Company) => (
               <tr key={company.id} className="hover:bg-slate-50 transition-colors">
                 <td className="p-4">
                   <div className="font-bold text-slate-800">{company.name}</div>

@@ -33,7 +33,6 @@ export default async function CompanyDashboard() {
   const pendingEntries = ledgerEntries?.filter(e => e.status === 'pending_approval') || [];
 
   const totalEarned = approvedEntries.reduce((sum, e) => sum + (e.coins_earned || 0), 0);
-  const totalUsed = approvedEntries.reduce((sum, e) => sum + (e.coins_used || 0), 0);
   const totalPending = pendingEntries.reduce((sum, e) => sum + (e.coins_earned || 0), 0);
 
   const annualTarget = company?.min_annual_jcoin_target || 0;

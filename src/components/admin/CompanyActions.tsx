@@ -22,7 +22,7 @@ export default function CompanyActions({ company }: { company: Company }) {
       setIsDeleting(true);
       try {
         await deleteCompany(company.id);
-      } catch (e) {
+      } catch {
         alert('Failed to delete company');
         setIsDeleting(false);
       }
