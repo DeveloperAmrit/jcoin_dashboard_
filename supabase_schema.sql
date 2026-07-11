@@ -3,6 +3,17 @@
 -- Enable UUID extension
 create extension if not exists "uuid-ossp";
 
+-- Drop existing tables to allow rerunning the script cleanly
+drop table if exists public.jcoin_ledger cascade;
+drop table if exists public.jcoin_rules cascade;
+drop table if exists public.mou_documents cascade;
+drop table if exists public.user_profiles cascade;
+drop table if exists public.companies cascade;
+
+drop type if exists user_role cascade;
+drop type if exists mou_status cascade;
+drop type if exists ledger_status cascade;
+
 -- 1. Companies Table
 create table public.companies (
   id uuid primary key default uuid_generate_v4(),
@@ -48,7 +59,10 @@ create table public.mou_documents (
 create table public.jcoin_rules (
   id uuid primary key default uuid_generate_v4(),
   activity_name text not null,
-  points_awarded integer not null default 0,
+  category text,
+  unit_of_measurement text,
+  points_awarded numeric not null default 0,
+  cap_rule text,
   annual_cap integer,
   validity_months integer default 12,
   is_eligible boolean default true,
@@ -64,8 +78,8 @@ create table public.jcoin_ledger (
   date date not null default current_date,
   activity_id uuid references public.jcoin_rules(id) on delete set null,
   description text,
-  coins_earned integer default 0,
-  coins_used integer default 0,
+  coins_earned numeric default 0,
+  coins_used numeric default 0,
   status ledger_status not null default 'pending_approval',
   supporting_document_url text,
   created_at timestamp with time zone default now()

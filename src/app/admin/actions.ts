@@ -119,7 +119,10 @@ export async function deleteCompany(id: string) {
 
 export async function addRule(formData: FormData) {
   const activity_name = formData.get('activity_name') as string;
-  const points_awarded = parseInt(formData.get('points_awarded') as string) || 0;
+  const category = formData.get('category') as string || null;
+  const unit_of_measurement = formData.get('unit_of_measurement') as string || null;
+  const points_awarded = parseFloat(formData.get('points_awarded') as string) || 0;
+  const cap_rule = formData.get('cap_rule') as string || null;
   const annual_cap = formData.get('annual_cap') ? parseInt(formData.get('annual_cap') as string) : null;
   const validity_months = formData.get('validity_months') ? parseInt(formData.get('validity_months') as string) : null;
 
@@ -131,7 +134,10 @@ export async function addRule(formData: FormData) {
     .from('jcoin_rules')
     .insert({
       activity_name,
+      category,
+      unit_of_measurement,
       points_awarded,
+      cap_rule,
       annual_cap,
       validity_months
     });

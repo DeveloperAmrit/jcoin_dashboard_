@@ -54,15 +54,35 @@ export default function AddRuleModal() {
                 <input required name="activity_name" type="text" placeholder="e.g., Guest Lecture" className="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none" />
               </div>
 
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Category</label>
+                  <select name="category" className="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="">None</option>
+                    <option value="Academic/R&D">Academic/R&D</option>
+                    <option value="Non-Academic">Non-Academic</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Points Awarded *</label>
+                  <input required name="points_awarded" type="number" step="0.5" min="0" className="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none" />
+                </div>
+              </div>
+              
               <div>
-                <label className="block text-sm font-medium mb-1">Points Awarded *</label>
-                <input required name="points_awarded" type="number" min="1" className="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none" />
+                <label className="block text-sm font-medium mb-1">Unit of Measurement</label>
+                <input name="unit_of_measurement" type="text" placeholder="e.g., Per ₹10L paid, Per year" className="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Cap Rule (Description)</label>
+                <input name="cap_rule" type="text" placeholder="e.g., Capped at 50% of annual obligation" className="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Annual Cap</label>
-                  <input name="annual_cap" type="number" placeholder="Optional" className="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none" />
+                  <label className="block text-sm font-medium mb-1">Annual Cap (Fixed Amount)</label>
+                  <input name="annual_cap" type="number" placeholder="Optional fixed points cap" className="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Validity (Months)</label>
