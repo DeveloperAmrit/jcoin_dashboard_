@@ -580,7 +580,7 @@ function BreakdownTab({
                   >
                     <div className="w-full h-full min-h-[48px] flex items-center justify-center relative">
                       {hasValue ? (
-                        <span className={`font-black tracking-tight ${valueMode === 'amount' && (activity.unit === 'perTenLakhPaid' || activity.unit === 'perLakhPaid') ? 'text-[10px]' : 'text-sm'} ${textColor}`}>
+                        <span className={`font-black tracking-tight ${valueMode === 'amount' && (activity.unit === 'perTenLakhPaid' || activity.unit === 'perLakhPaid' || activity.unit === 'perTenThousandPaid' || activity.unit === 'perFiveThousandPaid') ? 'text-[10px]' : 'text-sm'} ${textColor}`}>
                           {valueMode === 'jcoins' ? (
                             value
                           ) : (
@@ -589,6 +589,10 @@ function BreakdownTab({
                               ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(data!.totalAmount * 1000000)
                               : activity.unit === 'perLakhPaid'
                               ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(data!.totalAmount * 100000)
+                              : activity.unit === 'perTenThousandPaid'
+                              ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(data!.totalAmount * 10000)
+                              : activity.unit === 'perFiveThousandPaid'
+                              ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(data!.totalAmount * 5000)
                               : value.toLocaleString()
                           )}
                         </span>

@@ -34,13 +34,28 @@ export default function AddContributionModal({
   const [warning, setWarning] = useState('');
   const [companyId, setCompanyId] = useState(preSelectedCompanyId || '');
   const [activityId, setActivityId] = useState(preSelectedActivityId || '');
-  const [amount, setAmount] = useState(0);
+  const [inputValue, setInputValue] = useState(0);
+  const [students, setStudents] = useState(0);
+  const [months, setMonths] = useState(0);
 
   const selectedCompany = companies.find((c) => c.id === companyId);
   const selectedActivity = activities.find((a) => a.id === activityId);
-  const previewJCoins = selectedActivity ? amount * selectedActivity.rate : 0;
 
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+
+  // Compute the final DB amount multiplier based on contextual inputs
+  let amount = 0;
+  if (selectedActivity) {
+    switch (selectedActivity.unit) {
+      case 'perTenLakhPaid': amount = inputValue / 10; break;
+      case 'perLakhPaid': amount = inputValue; break;
+      case 'perTenThousandPaid': amount = inputValue / 10; break;
+      case 'perFiveThousandPaid': amount = inputValue / 5; break;
+      case 'perStudentPerMonth': amount = students * months; break;
+      default: amount = inputValue; break;
+    }
+  }
+  const previewJCoins = selectedActivity ? amount * selectedActivity.rate : 0;
 
   // Check cap warnings when company, activity, or date changes
   useEffect(() => {
@@ -223,30 +238,88 @@ export default function AddContributionModal({
             )}
           </div>
 
-          {/* Amount */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Amount {selectedActivity ? `(${selectedActivity.unit_label || selectedActivity.unit})` : ''} *
-            </label>
-            <input
-              required name="amount" type="number" step="any" min="0"
-              onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
-              className="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
-            />
-          </div>
+          {/* Contextual Inputs */}
+          {selectedActivity && (
+            <div className="space-y-4">
+              {/* Calculate the DB amount multiplier based on inputs */}
+              {(() => {
+                let computedAmount = 0;
+                switch (selectedActivity.unit) {
+                  case 'perTenLakhPaid': computedAmount = inputValue / 10; break;
+                  case 'perLakhPaid': computedAmount = inputValue; break;
+                  case 'perTenThousandPaid': computedAmount = inputValue / 10; break;
+                  case 'perFiveThousandPaid': computedAmount = inputValue / 5; break;
+                  case 'perStudentPerMonth': computedAmount = students * months; break;
+                  default: computedAmount = inputValue; break;
+                }
+                const previewJCoins = computedAmount * selectedActivity.rate;
 
-          {/* J-Coins Preview */}
-          {selectedActivity && amount > 0 && (
-            <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-emerald-700">J-Coins to be earned</span>
-                <span className="text-2xl font-bold text-emerald-800">
-                  {previewJCoins.toLocaleString()} JC
-                </span>
-              </div>
-              <p className="text-xs text-emerald-600 mt-1">
-                {amount} × {selectedActivity.rate} JC per {selectedActivity.unit_label || selectedActivity.unit}
-              </p>
+                return (
+                  <>
+                    <input type="hidden" name="amount" value={computedAmount} />
+
+                    {selectedActivity.unit === 'perStudentPerMonth' ? (
+                      <div className="flex gap-4">
+                        <div className="flex-1">
+                          <label className="block text-sm font-medium mb-1">Number of Students *</label>
+                          <input
+                            required type="number" min="0" step="1"
+                            value={students || ''}
+                            onChange={(e) => setStudents(parseInt(e.target.value) || 0)}
+                            className="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label className="block text-sm font-medium mb-1">Number of Months *</label>
+                          <input
+                            required type="number" min="0" step="1"
+                            value={months || ''}
+                            onChange={(e) => setMonths(parseInt(e.target.value) || 0)}
+                            className="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <label className="block text-sm font-medium mb-1">
+                          {selectedActivity.unit === 'perTenLakhPaid' || selectedActivity.unit === 'perLakhPaid'
+                            ? 'Amount (in Lakhs) *'
+                            : selectedActivity.unit === 'perTenThousandPaid' || selectedActivity.unit === 'perFiveThousandPaid'
+                            ? 'Amount (in Thousands) *'
+                            : selectedActivity.unit === 'perYear' || selectedActivity.unit === 'annually'
+                            ? 'Duration (Years) *'
+                            : selectedActivity.unit === 'perHour'
+                            ? 'Duration (Hours) *'
+                            : selectedActivity.unit === 'perGraduateHired'
+                            ? 'Number of People *'
+                            : `Amount (${selectedActivity.unit_label || selectedActivity.unit}) *`}
+                        </label>
+                        <input
+                          required type="number" step="any" min="0"
+                          value={inputValue || ''}
+                          onChange={(e) => setInputValue(parseFloat(e.target.value) || 0)}
+                          className="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                        />
+                      </div>
+                    )}
+
+                    {/* J-Coins Preview */}
+                    {computedAmount > 0 && (
+                      <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-medium text-emerald-700">J-Coins to be earned</span>
+                          <span className="text-2xl font-bold text-emerald-800">
+                            {previewJCoins.toLocaleString()} JC
+                          </span>
+                        </div>
+                        <p className="text-xs text-emerald-600 mt-1">
+                          Multiplier: {computedAmount} × {selectedActivity.rate} JC per {selectedActivity.unit_label || selectedActivity.unit}
+                        </p>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           )}
 
