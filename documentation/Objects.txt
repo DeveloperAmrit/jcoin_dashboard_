@@ -1,0 +1,30 @@
+Company object
+    - Id
+    - Name (string)
+    - Term of contract (number, in years)
+    - Starting date 
+    - Ending date
+    - Room allocated (string)
+    - Area occupied (number, in sq. ft.)
+    - Mode of joining (online/offline)
+    - Target per term year (number, in j coins, calculated from area occupied)
+    - Earned history of every term year (json object, list of earn_ids for each term year)
+
+Earn object
+    - Id
+    - CompanyId
+    - ActivityId
+    - Amount (number, in unit of activity)
+    - J_coins_earned (number, j coins earned = amount * rate_of_the_activity)
+    - timestamp (datetime, the datetime on which this earning was done)
+
+
+Acitivity object
+    - Id
+    - Category (Academic/Non-Academic/Sponsorship)
+    - Cap (number, in %, detemined from Category, 100% for academic, 50% for non-academic and 10% for sponship)
+    - Title (String)
+    - Description (string, optional)
+    - Unit (perLakhPaid/perYear/perGraduteHired,perStudentPerMonth/perHour/perThousandPaid)
+    - Rate (number, how much for one J-coin)
+

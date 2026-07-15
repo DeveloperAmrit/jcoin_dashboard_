@@ -3,16 +3,7 @@
 import { useState } from 'react';
 import { deleteCompany } from '@/app/admin/actions';
 import EditCompanyModal from './EditCompanyModal';
-
-interface Company {
-  id: string;
-  name: string;
-  contact_person: string;
-  contact_email: string;
-  agreement_start_date: string | null;
-  agreement_end_date: string | null;
-  min_annual_jcoin_target: number;
-}
+import type { Company } from '@/lib/types';
 
 export default function CompanyActions({ company }: { company: Company }) {
   const [isDeleting, setIsDeleting] = useState(false);

@@ -1,0 +1,3 @@
+Cap Warning system
+1. When after creating a earning, if any of the non-academic or sponship cap exceeded. Create the earning but after that warn the user.  
+2. if cap is already exceeded warn user when he creates a new earning for the comapany which may increase this cap further.

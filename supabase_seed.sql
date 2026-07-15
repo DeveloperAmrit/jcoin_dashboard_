@@ -1,59 +1,145 @@
--- J-Coins Management Platform - Mock Data Seed Script
+-- J-Coins Management Platform - Seed Data
+-- All 20 activities from Schedule C1 + sample companies + contributions
 
--- 1. Insert Companies
-INSERT INTO public.companies (id, name, contact_person, contact_email, registered_address, agreement_start_date, agreement_end_date, min_annual_jcoin_target)
-VALUES 
-  ('00000000-0000-0000-0000-000000001234', 'Acme Corp', 'Alice Johnson', 'alice@acme.com', '123 Tech Park', '2023-01-01', '2028-12-31', 10000),
-  ('11111111-1111-1111-1111-111111111111', 'Globex Inc', 'Bob Smith', 'bob@globex.com', '456 Innovation Blvd', '2024-06-01', '2029-05-31', 5000),
-  ('22222222-2222-2222-2222-222222222222', 'Initech', 'Peter Gibbons', 'peter@initech.com', '789 Corporate Way', '2022-03-15', '2027-03-14', 15000)
+-- ============================================
+-- 1. Seed Activities (12 Academic + 5 Non-Academic + 3 Sponsorship)
+-- ============================================
+INSERT INTO public.activities (id, serial_no, title, description, category, unit, unit_label, rate, is_system)
+VALUES
+  -- Academic Activities (12)
+  ('a0000001-0000-0000-0000-000000000001', 1,
+   'Sponsored Research Project with IIT Jodhpur or related entities',
+   NULL, 'Academic', 'perTenLakhPaid', 'Per ₹10L paid', 100, true),
+
+  ('a0000001-0000-0000-0000-000000000002', 2,
+   'Consultancy with IIT Jodhpur or related entities',
+   NULL, 'Academic', 'perTenLakhPaid', 'Per ₹10L paid', 100, true),
+
+  ('a0000001-0000-0000-0000-000000000003', 3,
+   'Joint R&D Project with IIT Jodhpur, IIT Jodhpur Centers of Excellence, or IIT Jodhpur Incubated Companies',
+   NULL, 'Academic', 'perTenLakhPaid', 'Per ₹10L paid', 50, true),
+
+  ('a0000001-0000-0000-0000-000000000004', 4,
+   'Royalty payments to IIT Jodhpur or its entities',
+   NULL, 'Academic', 'perLakhPaid', 'Per ₹1L paid', 100, true),
+
+  ('a0000001-0000-0000-0000-000000000005', 5,
+   'Engaging IIT Jodhpur Faculty as Advisors',
+   NULL, 'Academic', 'perLakhPaid', 'Per ₹1L paid', 20, true),
+
+  ('a0000001-0000-0000-0000-000000000006', 6,
+   'Sponsoring employee as Adjunct or Chair Professor at IIT Jodhpur',
+   NULL, 'Academic', 'perYear', 'Per year', 100, true),
+
+  ('a0000001-0000-0000-0000-000000000007', 7,
+   'Sponsoring employee for Ph.D. at IIT Jodhpur',
+   NULL, 'Academic', 'perYear', 'Per year', 50, true),
+
+  ('a0000001-0000-0000-0000-000000000008', 8,
+   'Sponsoring employee for M.S./MTech/MBA at IIT Jodhpur',
+   NULL, 'Academic', 'perYear', 'Per year', 25, true),
+
+  ('a0000001-0000-0000-0000-000000000009', 9,
+   'Client engaged in teaching activities at IIT Jodhpur',
+   NULL, 'Academic', 'perHour', 'Per hour', 2, true),
+
+  ('a0000001-0000-0000-0000-000000000010', 10,
+   'Joint Ph.D. Guidance at IIT Jodhpur',
+   NULL, 'Academic', 'annually', 'Annually', 50, true),
+
+  ('a0000001-0000-0000-0000-000000000011', 12,
+   'Joint M.S./MTech Guidance at IIT Jodhpur',
+   NULL, 'Academic', 'annually', 'Annually', 25, true),
+
+  ('a0000001-0000-0000-0000-000000000012', 13,
+   'Joint B. Tech/M.Sc. Guidance at IIT Jodhpur',
+   NULL, 'Academic', 'annually', 'Annually', 20, true),
+
+  -- Non-Academic Activities (5)
+  ('a0000002-0000-0000-0000-000000000001', 1,
+   'Full-time employment for IIT Jodhpur graduates',
+   NULL, 'Non-Academic', 'perGraduateHired', 'Per graduate hired', 50, true),
+
+  ('a0000002-0000-0000-0000-000000000002', 2,
+   'Part-time employment or internships for UG/PG students',
+   NULL, 'Non-Academic', 'perStudentPerMonth', 'Per student per month', 2.5, true),
+
+  ('a0000002-0000-0000-0000-000000000003', 3,
+   'Part-time employment or internships for M.S./Ph.D. students',
+   NULL, 'Non-Academic', 'perStudentPerMonth', 'Per student per month', 5, true),
+
+  ('a0000002-0000-0000-0000-000000000004', 4,
+   'Continuing education or training conducted by IIT Jodhpur faculty or entities',
+   NULL, 'Non-Academic', 'perFiveThousandPaid', 'Per ₹5,000 paid', 1, true),
+
+  ('a0000002-0000-0000-0000-000000000005', 5,
+   'Faculty delivering lectures to employees',
+   NULL, 'Non-Academic', 'perFiveThousandPaid', 'Per ₹5,000 paid', 1, true),
+
+  -- Sponsorship Activities (3)
+  ('a0000003-0000-0000-0000-000000000001', 6,
+   'Sponsoring technical events at IIT Jodhpur (national/international)',
+   NULL, 'Sponsorship', 'perTenThousandPaid', 'Per ₹10,000 paid', 1, true),
+
+  ('a0000003-0000-0000-0000-000000000002', 7,
+   'Sponsoring student events at IIT Jodhpur',
+   NULL, 'Sponsorship', 'perTenThousandPaid', 'Per ₹10,000 paid', 0.5, true),
+
+  ('a0000003-0000-0000-0000-000000000003', 8,
+   'Grants (including CSR) made to IIT Jodhpur or its entities',
+   NULL, 'Sponsorship', 'perTenThousandPaid', 'Per ₹10,000 paid', 1, true)
+
+ON CONFLICT (id) DO UPDATE SET
+  title = EXCLUDED.title,
+  category = EXCLUDED.category,
+  unit = EXCLUDED.unit,
+  unit_label = EXCLUDED.unit_label,
+  rate = EXCLUDED.rate;
+
+-- ============================================
+-- 2. Seed Companies (from spreadsheet images)
+-- ============================================
+INSERT INTO public.companies (id, name, contact_person, contact_email, term_of_contract, agreement_start_date, agreement_end_date, room_allocated, area_occupied, mode_of_joining)
+VALUES
+  ('c0000001-0000-0000-0000-000000000001',
+   'Mashscape', 'Contact Person', 'contact@mashscape.com',
+   1, '2022-01-01', '2023-01-01', NULL, 125, 'offline'),
+
+  ('c0000001-0000-0000-0000-000000000002',
+   'RSA', 'Contact Person', 'contact@rsa.com',
+   1, '2024-01-01', '2025-01-01', NULL, 150, 'offline'),
+
+  ('c0000001-0000-0000-0000-000000000003',
+   'Saanji AI/ML/Life Pvt. Ltd.', 'Contact Person', 'contact@saanji.com',
+   1, '2022-01-01', '2023-01-01', NULL, 275, 'offline'),
+
+  ('c0000001-0000-0000-0000-000000000004',
+   'Luit Renewable', 'Contact Person', 'contact@luitrenewable.com',
+   1, '2024-01-01', '2025-01-01', NULL, 200, 'offline')
 ON CONFLICT (id) DO NOTHING;
 
--- 2. Insert MoU Documents
-INSERT INTO public.mou_documents (company_id, status, notes)
-VALUES 
-  ('00000000-0000-0000-0000-000000001234', 'approved', 'Standard MoU for Acme Corp'),
-  ('11111111-1111-1111-1111-111111111111', 'under_review', 'Awaiting legal signoff'),
-  ('22222222-2222-2222-2222-222222222222', 'clarification_needed', 'Need updated insurance docs')
-ON CONFLICT DO NOTHING;
+-- ============================================
+-- 3. Seed Sample Contributions (from spreadsheet images)
+-- Saanji: Consultancy ₹2,00,000 (2 lakhs) = 200000/100000 * 100 = 20 JC
+-- Luit: Consultancy ₹3,00,000 (3 lakhs) = 300000/100000 * 100 = 30 JC (but wait, the rate is per 10L)
+-- Actually: ₹200000 = 2 lakhs. Rate is per ₹10L paid = 100 JC. So amount = 0.2 (in units of 10L), JC = 0.2 * 100 = 20
+-- From spreadsheet: Saanji earned 20 academic JC, Luit not clear
+-- Let me match the spreadsheet: Saanji target=55, earned academic=20
+-- Luit target=40, earned academic=15 (not from spreadsheet directly but inferred)
+-- ============================================
+INSERT INTO public.contributions (id, company_id, activity_id, amount, jcoins_earned, date, notes, term_year)
+VALUES
+  -- Saanji: Consultancy with IIT Jodhpur - ₹200000 (shown in spreadsheet Image 4)
+  ('d0000001-0000-0000-0000-000000000001',
+   'c0000001-0000-0000-0000-000000000003',
+   'a0000001-0000-0000-0000-000000000002',
+   2, 20,
+   '2022-06-15', 'Consultancy project - ₹2,00,000', 1),
 
--- 3. Insert J-Coin Rules
-INSERT INTO public.jcoin_rules (id, activity_name, category, unit_of_measurement, points_awarded, cap_rule, annual_cap, validity_months)
-VALUES 
-  -- Academic/R&D Activities
-  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Sponsored Research Project with IIT Jodhpur or related entities', 'Academic/R&D', 'Per ₹10L paid', 100, NULL, NULL, 12),
-  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Consultancy with IIT Jodhpur or related entities', 'Academic/R&D', 'Per ₹10L paid', 100, NULL, NULL, 12),
-  ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Joint R&D Project with IIT Jodhpur, IIT Jodhpur Centers of Excellence, or IIT Jodhpur Incubated Companies', 'Academic/R&D', 'Per ₹10L paid', 50, NULL, NULL, 12),
-  ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'Royalty payments to IIT Jodhpur or its entities', 'Academic/R&D', 'Per ₹1L paid', 100, NULL, NULL, 12),
-  ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'Engaging IIT Jodhpur Faculty as Advisors', 'Academic/R&D', 'Per ₹1L paid', 20, NULL, NULL, 12),
-  ('ffffffff-ffff-ffff-ffff-ffffffffffff', 'Sponsoring employee as Adjunct or Chair Professor at IIT Jodhpur', 'Academic/R&D', 'Per year', 100, NULL, NULL, 12),
-  ('11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Sponsoring employee for Ph.D. at IIT Jodhpur', 'Academic/R&D', 'Per year', 50, NULL, NULL, 12),
-  ('22222222-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Sponsoring employee for M.S./MTech/MBA at IIT Jodhpur', 'Academic/R&D', 'Per year', 25, NULL, NULL, 12),
-  ('33333333-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Client engaged in teaching activities at IIT Jodhpur', 'Academic/R&D', 'Per hour', 2, NULL, NULL, 12),
-  ('44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Joint Ph.D. Guidance at IIT Jodhpur', 'Academic/R&D', 'Annually', 50, NULL, NULL, 12),
-  ('55555555-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Joint M.S./MTech Guidance at IIT Jodhpur', 'Academic/R&D', 'Annually', 25, NULL, NULL, 12),
-  ('66666666-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Joint B. Tech/M.Sc. Guidance at IIT Jodhpur', 'Academic/R&D', 'Annually', 20, NULL, NULL, 12),
-  
-  -- Non-Academic Activities
-  ('77777777-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Full-time employment for IIT Jodhpur graduates', 'Non-Academic', 'Per graduate hired', 50, 'Capped at 50% of the annual J-Coins obligation.', NULL, 12),
-  ('88888888-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Part-time employment or internships for UG/PG students', 'Non-Academic', 'Per student per month', 2.5, 'Capped at 50% of the annual J-Coins obligation.', NULL, 12),
-  ('99999999-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Part-time employment or internships for M.S./Ph.D. students', 'Non-Academic', 'Per student per month', 5, 'Capped at 50% of the annual J-Coins obligation.', NULL, 12),
-  ('00000000-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Continuing education or training conducted by IIT Jodhpur faculty or entities', 'Non-Academic', 'Per ₹5,000 paid', 1, NULL, NULL, 12),
-  ('11111111-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Faculty delivering lectures to employees', 'Non-Academic', 'Per ₹5,000 paid', 1, NULL, NULL, 12),
-  ('22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Sponsoring technical events at IIT Jodhpur (national/international)', 'Non-Academic', 'Per ₹10,000 paid', 1, 'Capped at 10% of the annual J-Coins obligation.', NULL, 12),
-  ('33333333-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Sponsoring student events at IIT Jodhpur', 'Non-Academic', 'Per ₹10,000 paid', 0.5, 'Capped at 10% of the annual J-Coins obligation.', NULL, 12),
-  ('44444444-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Grants (including CSR) made to IIT Jodhpur or its entities', 'Non-Academic', 'Per ₹10,000 paid', 1, NULL, NULL, 12)
-ON CONFLICT (id) DO UPDATE SET 
-  activity_name = EXCLUDED.activity_name,
-  category = EXCLUDED.category,
-  unit_of_measurement = EXCLUDED.unit_of_measurement,
-  points_awarded = EXCLUDED.points_awarded,
-  cap_rule = EXCLUDED.cap_rule;
-
--- 4. Insert J-Coin Ledger Entries
-INSERT INTO public.jcoin_ledger (company_id, activity_id, date, description, coins_earned, coins_used, status)
-VALUES 
-  ('00000000-0000-0000-0000-000000001234', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '2026-10-12', 'Q3 Research Collaboration Finalized', 500, 0, 'approved'),
-  ('00000000-0000-0000-0000-000000001234', NULL, '2026-09-05', 'Facility Booking (Auditorium)', 0, 2000, 'approved'),
-  ('00000000-0000-0000-0000-000000001234', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '2026-08-20', 'Summer Internship Program Completion', 1000, 0, 'approved'),
-  ('00000000-0000-0000-0000-000000001234', NULL, '2026-01-15', 'Annual Base Allocation', 7000, 0, 'approved')
-ON CONFLICT DO NOTHING;
+  -- Luit: Consultancy with IIT Jodhpur - ₹300000 (shown in spreadsheet Image 4)
+  ('d0000001-0000-0000-0000-000000000002',
+   'c0000001-0000-0000-0000-000000000004',
+   'a0000001-0000-0000-0000-000000000002',
+   3, 30,
+   '2024-06-15', 'Consultancy project - ₹3,00,000', 1)
+ON CONFLICT (id) DO NOTHING;

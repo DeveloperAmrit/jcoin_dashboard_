@@ -1,0 +1,51 @@
+Pages in admin portal
+1. Dashbaord (shows aggregated stats)
+2. Activities (list of Adacdemic, non-academic and sponship activites. Option to Create new custom activity)
+3. J coin sheet (most important page, excel like format)
+4. Schedule mails page (shows scheduled mails waiting for human confirmation)
+
+---------------------------------------
+
+Dashbaord page
+1. Show total number of companies
+2. Show total J coins issued
+3. Show total J coins earned by companies
+4. Show recent activities
+
+---------------------------------------
+
+Activities page
+1. Cards of different activities
+2. Option to create a new custom activity
+
+----------------------------------------
+J coin sheet page
+
+OVERALL
+1. Switchin between sheets should be like chrome tabs
+2. Option to add or remove any column in both sheets
+3. You need to provide as much columsn as possible as options
+
+SHEET 1
+
+By Default
+1. Show data for current financial year
+2. Default cloums: <fields of company>, j-coins earned this term year, term year ending date
+3. Option to see for past financial years
+
+Explaining some terms
+1. Term year: the year from the starting date of company's contract, different for different companies
+2. Financial year: 1 April – 31 March
+3. J coins earned resets to 0 every term year
+4. Term year ending date: In this financial year when will term year of the company ending
+
+SHEET 2 
+1. List of all activities as columns
+2. List of all comapanies as rows
+3. Show distribution of j-coins earned this term year
+4. Opion to change unit to Rs.
+
+-------------------------------------
+Scheduled mails page
+1. List of scheduled mails waiting for human confirmation
+2. Once user clicks send, the mail is sent

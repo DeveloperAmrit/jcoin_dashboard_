@@ -2,15 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Settings, 
-  Building2, 
+import {
+  LayoutDashboard,
+  FileText,
+  Building2,
   BarChart3,
   BookOpen,
   LogOut,
-  Coins
+  Sheet,
 } from 'lucide-react';
 import { logout } from '@/app/login/actions';
 
@@ -25,8 +24,8 @@ export default function Sidebar({ role }: SidebarProps) {
 
   const adminLinks = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { name: 'MoU Management', href: '/admin/mou', icon: FileText },
-    { name: 'Rules Engine', href: '/admin/rules', icon: Settings },
+    { name: 'J-Coin Sheet', href: '/admin/sheet', icon: Sheet },
+    { name: 'Activities', href: '/admin/activities', icon: BookOpen },
     { name: 'Companies', href: '/admin/companies', icon: Building2 },
     { name: 'Reports', href: '/admin/reports', icon: BarChart3 },
   ];
@@ -34,7 +33,6 @@ export default function Sidebar({ role }: SidebarProps) {
   const companyLinks = [
     { name: 'Dashboard', href: '/company', icon: LayoutDashboard },
     { name: 'My MoU', href: '/company/mou', icon: FileText },
-    { name: 'My Ledger', href: '/company/ledger', icon: Coins },
     { name: 'Compliance', href: '/company/compliance', icon: BookOpen },
   ];
 
@@ -51,7 +49,7 @@ export default function Sidebar({ role }: SidebarProps) {
         </div>
         <ProfileDropdown />
       </div>
-      
+
       <div className="flex-1 overflow-y-auto py-6 px-4">
         <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-3">
           {role === 'admin' ? 'Administration' : 'Company Portal'}
@@ -59,17 +57,17 @@ export default function Sidebar({ role }: SidebarProps) {
         <nav className="space-y-1">
           {links.map((link) => {
             const Icon = link.icon;
-            const isActive = link.href === '/admin' || link.href === '/company' 
+            const isActive = link.href === '/admin' || link.href === '/company'
               ? pathname === link.href
               : pathname === link.href || pathname.startsWith(link.href + '/');
-            
+
             return (
-              <Link 
-                key={link.name} 
+              <Link
+                key={link.name}
                 href={link.href}
                 className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${
-                  isActive 
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-900/20' 
+                  isActive
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-900/20'
                     : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                 }`}
               >
@@ -82,7 +80,7 @@ export default function Sidebar({ role }: SidebarProps) {
       </div>
 
       <div className="p-4 border-t border-slate-800">
-        <button 
+        <button
           onClick={() => logout()}
           className="flex items-center gap-3 w-full px-3 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
         >

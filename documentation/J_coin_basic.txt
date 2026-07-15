@@ -1,0 +1,43 @@
+First understand the concept of j coins.
+
+This dashbaord is used by staff at IIT Jodhpur techpark to manage their online contracts with industrial companies.
+
+A company does contract for X years. Its starting and ending date can be any date.
+
+Basic company data
+1. Name (string)
+2. Term of contract (number)
+3. Room allocated (string)
+4. Mode of joining (online or offline)
+5. Area occupied (number, in sq. ft.)
+
+-------------------------------
+
+During the term of contract of the company, they have to earn K  J-coins every year from their starting date. This is called target.
+NOTE: Target is per year but it remains same for all years through out the contract.
+
+How to calcualte target
+1. For offline mode: 1 J-coin per 5 sq. ft. of area occupied
+2. For online mode: Fixed 100 J-coins target
+
+------------------------------------
+
+Comapnies can earn J-coin only by Activities. Activities are of three types
+1. Academic
+2. Non-Academic
+3. Sponsorship
+
+Academic activities have no cap, a company can earn as many J-coins it wants by doing academic activities. 
+
+Non-Adacdemic activity has a cap of 50% of target. 
+
+Sponrship activity has a cap of 10% of target.
+
+The J-coins that a company earns is called earn.
+
+Earn is reset to 0 every year from a contract's starting date. (Keep the record of past earning before reseting it)
+
+
+--------------------------------------
+
+

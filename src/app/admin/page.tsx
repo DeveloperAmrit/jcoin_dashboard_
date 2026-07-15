@@ -1,63 +1,69 @@
 import { supabase } from '@/lib/supabase';
-interface Activity {
-  id: string;
-  date: string;
-  description: string;
-  created_at: string;
-  companies: { name: string } | null;
-}
+import { computeTarget, getCurrentTermYear, filterContributionsByTermYear, computeCategoryEarnings, getCurrentFinancialYear } from '@/lib/jcoin-utils';
+import type { Company, Activity, Contribution, ContributionWithCompanyAndActivity } from '@/lib/types';
 
-export const revalidate = 0; // Disable cache for dashboard
+export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
-  // Fetch total companies
-  const { count: totalCompanies } = await supabase
-    .from('companies')
-    .select('*', { count: 'exact', head: true });
+  // Fetch all data
+  const [companiesResult, activitiesResult, contributionsResult, recentResult] = await Promise.all([
+    supabase.from('companies').select('*'),
+    supabase.from('activities').select('*'),
+    supabase.from('contributions').select('*'),
+    supabase.from('contributions')
+      .select(`
+        id,
+        date,
+        notes,
+        jcoins_earned,
+        created_at,
+        companies ( name ),
+        activities ( title, category )
+      `)
+      .order('created_at', { ascending: false })
+      .limit(5),
+  ]);
 
-  // Fetch pending MoUs
-  const { count: pendingMoUs } = await supabase
-    .from('mou_documents')
-    .select('*', { count: 'exact', head: true })
-    .in('status', ['under_review', 'clarification_needed']);
+  const companies = (companiesResult.data || []) as Company[];
+  const activities = (activitiesResult.data || []) as Activity[];
+  const contributions = (contributionsResult.data || []) as Contribution[];
+  const recentActivity = (recentResult.data || []) as unknown as ContributionWithCompanyAndActivity[];
 
-  // Fetch total J-Coins issued
-  const { data: ledgerEntries } = await supabase
-    .from('jcoin_ledger')
-    .select('coins_earned')
-    .eq('status', 'approved');
-  
-  const totalCoinsIssued = ledgerEntries?.reduce((sum, entry) => sum + (entry.coins_earned || 0), 0) || 0;
+  // KPI: Total companies
+  const totalCompanies = companies.length;
 
-  // Recent Activity
-  const { data: recentActivity } = await supabase
-    .from('jcoin_ledger')
-    .select(`
-      id,
-      date,
-      description,
-      created_at,
-      companies ( name )
-    `)
-    .order('created_at', { ascending: false })
-    .limit(5);
+  // KPI: Total J-Coins earned (all companies, current term year)
+  let totalEarnedCurrentTerm = 0;
+  let companiesBelowTarget = 0;
+
+  for (const company of companies) {
+    const target = computeTarget(company);
+    const termYear = getCurrentTermYear(company);
+    const compContribs = contributions.filter((c) => c.company_id === company.id);
+    const termContribs = filterContributionsByTermYear(compContribs, termYear);
+    const earnings = computeCategoryEarnings(termContribs, activities);
+    totalEarnedCurrentTerm += earnings.total;
+    if (earnings.total < target) {
+      companiesBelowTarget++;
+    }
+  }
+
+  // KPI: Total activities
+  const totalActivities = activities.length;
+
+  const fy = getCurrentFinancialYear();
 
   const kpis = [
-    { label: 'Total Companies', value: totalCompanies?.toString() || '0', trend: 'Registered on platform' },
-    { label: 'Pending MoUs', value: pendingMoUs?.toString() || '0', trend: pendingMoUs ? 'Requires action' : 'All caught up' },
-    { label: 'Total J-Coins Issued', value: totalCoinsIssued.toLocaleString(), trend: 'Approved issuance' },
-    { label: 'System Status', value: 'Active', trend: 'Operational' },
+    { label: 'Total Companies', value: totalCompanies.toString(), trend: 'Registered on platform' },
+    { label: 'J-Coins Earned (Current Term)', value: totalEarnedCurrentTerm.toLocaleString(), trend: `FY ${fy.label}` },
+    { label: 'Below Target', value: companiesBelowTarget.toString(), trend: companiesBelowTarget > 0 ? 'Requires attention' : 'All on track' },
+    { label: 'Activities Available', value: totalActivities.toString(), trend: 'Across all categories' },
   ];
-
-  const activities = (recentActivity || []) as unknown as Activity[];
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-800">Admin Dashboard</h1>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm shadow-blue-500/20">
-          Generate Report
-        </button>
       </div>
 
       {/* KPI Cards */}
@@ -68,42 +74,49 @@ export default async function AdminDashboard() {
               <p className="text-sm font-medium text-slate-500 mb-1">{kpi.label}</p>
               <h3 className="text-3xl font-bold text-slate-800">{kpi.value}</h3>
             </div>
-            <p className={`text-xs font-medium mt-4 ${kpi.trend.includes('action') ? 'text-amber-500' : 'text-emerald-500'}`}>
+            <p className={`text-xs font-medium mt-4 ${kpi.trend.includes('attention') ? 'text-amber-500' : 'text-emerald-500'}`}>
               {kpi.trend}
             </p>
           </div>
         ))}
       </div>
 
-      {/* Main Content Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-6 min-h-[400px]">
-          <h2 className="text-lg font-bold text-slate-800 mb-4">J-Coin Issuance Trend</h2>
-          <div className="flex items-center justify-center h-[300px] text-slate-400 border-2 border-dashed border-slate-100 rounded-xl">
-            Chart will be rendered here
-          </div>
-        </div>
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 min-h-[400px]">
-          <h2 className="text-lg font-bold text-slate-800 mb-4">Recent Activity</h2>
-          <div className="space-y-4">
-            {activities.length > 0 ? (
-              activities.map((activity: Activity) => (
-                <div key={activity.id} className="flex gap-4 items-start border-b border-slate-50 pb-4 last:border-0">
-                  <div className="w-2 h-2 mt-2 rounded-full bg-blue-500"></div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-800">
-                      {activity.companies?.name || 'A company'} - {activity.description}
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      {new Date(activity.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
+      {/* Recent Activity */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+        <h2 className="text-lg font-bold text-slate-800 mb-4">Recent Contributions</h2>
+        <div className="space-y-4">
+          {recentActivity.length > 0 ? (
+            recentActivity.map((entry) => (
+              <div key={entry.id} className="flex gap-4 items-start border-b border-slate-50 pb-4 last:border-0">
+                <div className={`w-2 h-2 mt-2 rounded-full flex-shrink-0 ${
+                  entry.activities?.category === 'Academic'
+                    ? 'bg-blue-500'
+                    : entry.activities?.category === 'Non-Academic'
+                      ? 'bg-emerald-500'
+                      : 'bg-amber-500'
+                }`}></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-slate-800">
+                    {entry.companies?.name || 'A company'} — {entry.activities?.title || entry.notes || 'Contribution'}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {new Date(entry.created_at).toLocaleDateString()} · +{entry.jcoins_earned} JC
+                  </p>
                 </div>
-              ))
-            ) : (
-              <p className="text-sm text-slate-500">No recent activity.</p>
-            )}
-          </div>
+                <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                  entry.activities?.category === 'Academic'
+                    ? 'bg-blue-100 text-blue-700'
+                    : entry.activities?.category === 'Non-Academic'
+                      ? 'bg-emerald-100 text-emerald-700'
+                      : 'bg-amber-100 text-amber-700'
+                }`}>
+                  {entry.activities?.category || 'Other'}
+                </span>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-slate-500">No recent contributions.</p>
+          )}
         </div>
       </div>
     </div>
