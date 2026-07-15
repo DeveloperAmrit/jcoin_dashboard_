@@ -6,6 +6,7 @@ import type { Activity, Company, Contribution, ActivityCategory } from '@/lib/ty
 import {
   computeTarget,
   getCurrentTermYear,
+  getTermYearForDate,
   computeCategoryEarnings,
   checkCaps,
   filterContributionsByTermYear,
@@ -39,7 +40,9 @@ export default function AddContributionModal({
   const selectedActivity = activities.find((a) => a.id === activityId);
   const previewJCoins = selectedActivity ? amount * selectedActivity.rate : 0;
 
-  // Check cap warnings when company or activity changes
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+
+  // Check cap warnings when company, activity, or date changes
   useEffect(() => {
     if (!selectedCompany || !selectedActivity) {
       setWarning('');
@@ -47,7 +50,7 @@ export default function AddContributionModal({
     }
 
     const target = computeTarget(selectedCompany);
-    const termYear = getCurrentTermYear(selectedCompany);
+    const termYear = getTermYearForDate(selectedCompany, new Date(date));
     const termContributions = filterContributionsByTermYear(
       contributions.filter((c) => c.company_id === companyId),
       termYear
@@ -67,7 +70,7 @@ export default function AddContributionModal({
     } else {
       setWarning('');
     }
-  }, [companyId, activityId, selectedCompany, selectedActivity, contributions, activities]);
+  }, [companyId, activityId, date, selectedCompany, selectedActivity, contributions, activities]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -76,9 +79,10 @@ export default function AddContributionModal({
 
     const formData = new FormData(e.currentTarget);
 
-    // Add computed term_year
+    // Add computed term_year based on the submitted date
     if (selectedCompany) {
-      const termYear = getCurrentTermYear(selectedCompany);
+      const submittedDateStr = formData.get('date') as string;
+      const termYear = getTermYearForDate(selectedCompany, new Date(submittedDateStr));
       formData.set('term_year', String(termYear));
     }
 
@@ -88,7 +92,8 @@ export default function AddContributionModal({
       // Post-submission cap check
       if (selectedCompany && selectedActivity) {
         const target = computeTarget(selectedCompany);
-        const termYear = getCurrentTermYear(selectedCompany);
+        const submittedDateStr = formData.get('date') as string;
+        const termYear = getTermYearForDate(selectedCompany, new Date(submittedDateStr));
         const termContributions = filterContributionsByTermYear(
           contributions.filter((c) => c.company_id === companyId),
           termYear
@@ -101,7 +106,7 @@ export default function AddContributionModal({
           activity_id: activityId,
           amount,
           jcoins_earned: result.jcoins_earned || previewJCoins,
-          date: formData.get('date') as string,
+          date: submittedDateStr,
           notes: null,
           term_year: termYear,
           created_at: new Date().toISOString(),
@@ -250,7 +255,8 @@ export default function AddContributionModal({
             <label className="block text-sm font-medium mb-1">Date *</label>
             <input
               required name="date" type="date"
-              defaultValue={new Date().toISOString().split('T')[0]}
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
               className="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
             />
           </div>

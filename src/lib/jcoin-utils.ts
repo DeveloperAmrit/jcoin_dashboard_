@@ -59,13 +59,14 @@ export function getTermYearDateRange(
 // ============================================
 // Financial Year (April – March)
 // ============================================
-export function getCurrentFinancialYear(): { start: Date; end: Date; label: string } {
+export function getCurrentFinancialYear(): { start: Date; end: Date; label: string; startYear: number } {
   const now = new Date();
   const year = now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
   return {
     start: new Date(year, 3, 1), // April 1
     end: new Date(year + 1, 2, 31), // March 31
     label: `${year}-${(year + 1).toString().slice(-2)}`,
+    startYear: year,
   };
 }
 
@@ -74,17 +75,40 @@ export function getFinancialYearForDate(date: Date): string {
   return `${year}-${(year + 1).toString().slice(-2)}`;
 }
 
-// Get the term year ending date within the current financial year
-export function getTermYearEndingInFY(company: Company): Date | null {
-  const fy = getCurrentFinancialYear();
+export function getPastFinancialYears(count = 5): { start: Date; end: Date; label: string; startYear: number }[] {
+  const current = getCurrentFinancialYear();
+  const years = [];
+  for (let i = 0; i < count; i++) {
+    const year = current.startYear - i;
+    years.push({
+      start: new Date(year, 3, 1),
+      end: new Date(year + 1, 2, 31),
+      label: `${year}-${(year + 1).toString().slice(-2)}`,
+      startYear: year,
+    });
+  }
+  return years;
+}
+
+// Get the term year ending date within a specific financial year
+export function getTermYearEndingInSpecificFY(company: Company, fyStartYear: number): Date | null {
+  const fyStart = new Date(fyStartYear, 3, 1);
+  const fyEnd = new Date(fyStartYear + 1, 2, 31);
   const start = new Date(company.agreement_start_date);
 
-  // Find the term year anniversary that falls within the current FY
-  for (let y = 1; y <= company.term_of_contract + 1; y++) {
+  // If the company started after this financial year, they don't have an ending date in this FY
+  if (start > fyEnd) return null;
+
+  // Find the term year anniversary that falls within the FY
+  for (let y = 1; y <= company.term_of_contract + 5; y++) { // +5 to look ahead
     const anniversary = new Date(start);
     anniversary.setFullYear(start.getFullYear() + y);
-    if (anniversary >= fy.start && anniversary <= fy.end) {
-      return anniversary;
+    // Term year ending date is the day before the anniversary
+    const endingDate = new Date(anniversary);
+    endingDate.setDate(endingDate.getDate() - 1);
+    
+    if (endingDate >= fyStart && endingDate <= fyEnd) {
+      return endingDate;
     }
   }
   return null;
