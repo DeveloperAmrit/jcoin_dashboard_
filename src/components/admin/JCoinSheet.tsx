@@ -347,7 +347,7 @@ function OverviewTab({
           <th className="p-4 sticky left-0 bg-slate-50/95 backdrop-blur-md z-20 shadow-[1px_0_0_0_#e2e8f0]">S.No</th>
           <th className="p-4 sticky left-[60px] bg-slate-50/95 backdrop-blur-md z-20 min-w-[200px] shadow-[1px_0_0_0_#e2e8f0]">Company</th>
           
-          <th className="p-4">Term Ending Date</th>
+          <th className="p-4">Term ending date (This FY)</th>
           <th className="p-4 bg-blue-50/50 text-blue-700">JC Earned (This Term)</th>
 
           {visibleColumns.term && <th className="p-4">Term</th>}
@@ -578,11 +578,19 @@ function BreakdownTab({
                     onClick={() => onCellClick(company.id, activity.id)}
                     title={`Click to add contribution: ${company.name} → ${activity.title}`}
                   >
-                    <div className="w-full h-full min-h-[44px] flex items-center justify-center relative">
+                    <div className="w-full h-full min-h-[48px] flex items-center justify-center relative">
                       {hasValue ? (
-                        <span className={`font-black text-sm ${textColor}`}>
-                          {valueMode === 'amount' && activity.unit_label?.includes('₹') ? '₹ ' : ''}
-                          {valueMode === 'amount' ? value.toLocaleString() : value}
+                        <span className={`font-black tracking-tight ${valueMode === 'amount' && (activity.unit === 'perTenLakhPaid' || activity.unit === 'perLakhPaid') ? 'text-[10px]' : 'text-sm'} ${textColor}`}>
+                          {valueMode === 'jcoins' ? (
+                            value
+                          ) : (
+                            // Format amount based on unit
+                            activity.unit === 'perTenLakhPaid' 
+                              ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(data!.totalAmount * 1000000)
+                              : activity.unit === 'perLakhPaid'
+                              ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(data!.totalAmount * 100000)
+                              : value.toLocaleString()
+                          )}
                         </span>
                       ) : (
                         <div className="opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-200">
