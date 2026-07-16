@@ -10,6 +10,7 @@ import {
   BookOpen,
   LogOut,
   Sheet,
+  IndianRupee,
 } from 'lucide-react';
 import { logout } from '@/app/login/actions';
 
@@ -25,6 +26,7 @@ export default function Sidebar({ role }: SidebarProps) {
   const adminLinks = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'J-Coin Sheet', href: '/admin/sheet', icon: Sheet },
+    { name: 'Rentals', href: '/admin/rentals', icon: IndianRupee },
     { name: 'Activities', href: '/admin/activities', icon: BookOpen },
     { name: 'Companies', href: '/admin/companies', icon: Building2 },
     { name: 'Reports', href: '/admin/reports', icon: BarChart3 },

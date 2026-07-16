@@ -9,18 +9,21 @@ import type {
   CapStatus,
   ActivityCategory,
 } from './types';
+import { CATEGORY_RATE } from './types';
 
 // ============================================
 // Target Computation
-// Per documentation:
-//   Offline → 1 JC per 5 sq ft = area_occupied / 5
+// Per Annexure C:
+//   Offline → (area_occupied / 250) × CATEGORY_RATE[category]
 //   Online  → Fixed 100 JC
+// Note: term duration is NOT derived from category (user-entered).
 // ============================================
 export function computeTarget(company: Company): number {
   if (company.mode_of_joining === 'online') {
     return 100;
   }
-  return Math.ceil(company.area_occupied / 5);
+  const rate = CATEGORY_RATE[company.category] ?? 50; // fallback to S1 rate
+  return Math.ceil((company.area_occupied / 250) * rate);
 }
 
 // ============================================

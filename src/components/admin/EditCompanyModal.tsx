@@ -2,7 +2,14 @@
 
 import { useState } from 'react';
 import { editCompany } from '@/app/admin/actions';
-import type { Company } from '@/lib/types';
+import { CATEGORY_RATE } from '@/lib/types';
+import type { Company, CompanyCategory } from '@/lib/types';
+
+const CATEGORY_LABELS: Record<CompanyCategory, string> = {
+  S1: 'Short Term S1 (50 JC / 250 sq ft)',
+  S2: 'Short Term S2 (100 JC / 250 sq ft)',
+  L1: 'Long Term L1 (100 JC / 250 sq ft)',
+};
 
 export default function EditCompanyModal({ company }: { company: Company }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,9 +19,12 @@ export default function EditCompanyModal({ company }: { company: Company }) {
   const [area, setArea] = useState(company.area_occupied);
   const [term, setTerm] = useState(company.term_of_contract);
   const [startDate, setStartDate] = useState(company.agreement_start_date);
+  const [category, setCategory] = useState<CompanyCategory>(company.category ?? 'S1');
 
-  // Compute target preview
-  const computedTarget = mode === 'online' ? 100 : Math.ceil(area / 5);
+  // Compute target preview using category rate
+  const rate = CATEGORY_RATE[category];
+  const computedTarget =
+    mode === 'online' ? 100 : Math.ceil((area / 250) * rate);
 
   // Compute end date preview
   const computedEndDate = startDate
@@ -82,6 +92,26 @@ export default function EditCompanyModal({ company }: { company: Company }) {
                 </div>
               </div>
 
+              {/* Category */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Category *</label>
+                <select
+                  name="category"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value as CompanyCategory)}
+                  className="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                >
+                  {(Object.keys(CATEGORY_LABELS) as CompanyCategory[]).map((cat) => (
+                    <option key={cat} value={cat}>
+                      {CATEGORY_LABELS[cat]}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-slate-400 mt-1">
+                  Rate: {rate} JC per 250 sq ft — term duration is set separately below.
+                </p>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Term of Contract (years) *</label>
@@ -136,6 +166,19 @@ export default function EditCompanyModal({ company }: { company: Company }) {
                 </div>
               )}
 
+              {/* Associated Professors */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Associated Professors</label>
+                <textarea
+                  name="associated_professors"
+                  rows={2}
+                  defaultValue={(company.associated_professors ?? []).join(', ')}
+                  placeholder="e.g. Prof. Sharma, Prof. Mehta, Dr. Gupta"
+                  className="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                />
+                <p className="text-xs text-slate-400 mt-1">Separate multiple names with commas.</p>
+              </div>
+
               {/* Computed Target Preview */}
               <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
                 <div className="flex justify-between items-center">
@@ -145,7 +188,7 @@ export default function EditCompanyModal({ company }: { company: Company }) {
                 <p className="text-xs text-blue-600 mt-1">
                   {mode === 'online'
                     ? 'Fixed 100 JC for online companies'
-                    : `${area} sq ft ÷ 5 = ${computedTarget} JC`}
+                    : `${area} sq ft ÷ 250 × ${rate} (${category} rate) = ${computedTarget} JC`}
                 </p>
               </div>
 

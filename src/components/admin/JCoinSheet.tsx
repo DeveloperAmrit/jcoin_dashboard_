@@ -27,11 +27,13 @@ type ValueMode = 'jcoins' | 'amount';
 
 // Define available columns for Tab 1
 const AVAILABLE_COLUMNS = [
+  { id: 'category', label: 'Category' },
   { id: 'term', label: 'Term of Contract' },
   { id: 'room', label: 'Room Allocated' },
   { id: 'mode', label: 'Mode of Joining' },
   { id: 'area', label: 'Area Occupied' },
   { id: 'target', label: 'JC Required / Year' },
+  { id: 'professors', label: 'Associated Professors' },
   { id: 'academic', label: 'Earned — Academic' },
   { id: 'nonAcademic', label: 'Earned — Non-Academic' },
   { id: 'sponsorship', label: 'Earned — Sponsorship' },
@@ -59,11 +61,13 @@ export default function JCoinSheet({ companies, activities, contributions }: Pro
 
   // Column Visibility Selection
   const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>({
+    category: true,
     term: true,
     room: true,
     mode: true,
     area: true,
     target: true,
+    professors: true,
     academic: true,
     nonAcademic: true,
     sponsorship: true,
@@ -350,13 +354,15 @@ function OverviewTab({
           <th className="p-4">Term ending date (This FY)</th>
           <th className="p-4 bg-blue-50/50 text-blue-700">JC Earned (This Term)</th>
 
+          {visibleColumns.category && <th className="p-4">Category</th>}
           {visibleColumns.term && <th className="p-4">Term</th>}
           {visibleColumns.room && <th className="p-4">Room</th>}
           {visibleColumns.mode && <th className="p-4">Mode</th>}
           {visibleColumns.area && <th className="p-4">Area (sq ft)</th>}
           
-          {visibleColumns.target && <th className="p-4 bg-slate-100/50 text-slate-700">Target (JC/yr)</th>}
+              {visibleColumns.target && <th className="p-4 bg-slate-100/50 text-slate-700">Target (JC/yr)</th>}
           
+          {visibleColumns.professors && <th className="p-4 min-w-[180px]">Associated Professors</th>}
           {visibleColumns.academic && <th className="p-4 bg-blue-50/50 text-blue-700">Academic</th>}
           {visibleColumns.nonAcademic && (
             <th className="p-4 bg-emerald-50/50 text-emerald-700">
@@ -408,6 +414,25 @@ function OverviewTab({
                 </div>
               </td>
 
+              {visibleColumns.category && (
+                <td className="p-4">
+                  {(() => {
+                    const cat = company.category;
+                    const cls =
+                      cat === 'S1'
+                        ? 'bg-sky-100 text-sky-700 border-sky-200'
+                        : cat === 'S2'
+                        ? 'bg-violet-100 text-violet-700 border-violet-200'
+                        : 'bg-amber-100 text-amber-700 border-amber-200';
+                    return (
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${cls}`}>
+                        {cat ?? '—'}
+                      </span>
+                    );
+                  })()}
+                </td>
+              )}
+
               {visibleColumns.term && (
                 <td className="p-4 text-slate-600 text-xs">
                   {new Date(company.agreement_start_date).getFullYear()} –{' '}
@@ -429,6 +454,25 @@ function OverviewTab({
               {visibleColumns.area && <td className="p-4 text-slate-600 font-medium">{company.area_occupied || '—'}</td>}
               
               {visibleColumns.target && <td className="p-4 font-bold text-slate-700 bg-slate-50/30">{target}</td>}
+              
+              {visibleColumns.professors && (
+                <td className="p-4">
+                  {(company.associated_professors ?? []).length > 0 ? (
+                    <div className="flex flex-wrap gap-1">
+                      {(company.associated_professors ?? []).map((prof: string, i: number) => (
+                        <span
+                          key={i}
+                          className="px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-md text-[10px] font-medium whitespace-nowrap"
+                        >
+                          {prof}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="text-slate-400 text-xs italic">—</span>
+                  )}
+                </td>
+              )}
               
               {visibleColumns.academic && <td className="p-4 font-semibold text-blue-600 bg-blue-50/10">{earnings.academic || '—'}</td>}
               {visibleColumns.nonAcademic && (

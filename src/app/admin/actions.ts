@@ -18,6 +18,12 @@ export async function addCompany(formData: FormData) {
   const name = formData.get('name') as string;
   const contact_person = formData.get('contact_person') as string;
   const contact_email = formData.get('contact_email') as string;
+  const category = (formData.get('category') as string) || 'S1';
+  const associated_professors_raw = (formData.get('associated_professors') as string) || '';
+  const associated_professors = associated_professors_raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
   const term_of_contract = parseInt(formData.get('term_of_contract') as string) || 1;
   const agreement_start_date = formData.get('agreement_start_date') as string;
   const room_allocated = (formData.get('room_allocated') as string) || null;
@@ -54,6 +60,8 @@ export async function addCompany(formData: FormData) {
       name,
       contact_person,
       contact_email,
+      category,
+      associated_professors,
       term_of_contract,
       agreement_start_date,
       agreement_end_date,
@@ -74,6 +82,12 @@ export async function editCompany(id: string, formData: FormData) {
   const name = formData.get('name') as string;
   const contact_person = formData.get('contact_person') as string;
   const contact_email = formData.get('contact_email') as string;
+  const category = (formData.get('category') as string) || 'S1';
+  const associated_professors_raw = (formData.get('associated_professors') as string) || '';
+  const associated_professors = associated_professors_raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
   const term_of_contract = parseInt(formData.get('term_of_contract') as string) || 1;
   const agreement_start_date = formData.get('agreement_start_date') as string;
   const room_allocated = (formData.get('room_allocated') as string) || null;
@@ -96,6 +110,8 @@ export async function editCompany(id: string, formData: FormData) {
       name,
       contact_person,
       contact_email,
+      category,
+      associated_professors,
       term_of_contract,
       agreement_start_date,
       agreement_end_date,
