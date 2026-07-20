@@ -8,6 +8,8 @@ import {
   getFYMonths,
   getCurrentFYStartYear,
   computeMonthlyRent,
+  computeMaintenanceCost,
+  computeTotalMonthlyDue,
   computeSecurityDeposit,
   formatINR,
   type FYMonth,
@@ -526,7 +528,7 @@ export default function RentalSheet({ companies, payments, deposits }: Props) {
         if (mDate < contractStart || mDate > contractEnd) continue;
         if (mDate > now) continue;
 
-        const due = computeMonthlyRent(company, m.year, m.month);
+        const due = computeTotalMonthlyDue(company, m.year, m.month);
         totalExpected += due;
         const payment = paymentMap.get(`${company.id}_${m.year}_${m.month}`);
         if (payment) {
@@ -725,6 +727,8 @@ export default function RentalSheet({ companies, payments, deposits }: Props) {
                     {/* Monthly Rent (as of April of selected FY) */}
                     {(() => {
                       const aprilRent = computeMonthlyRent(company, fyStartYear, 4);
+                      const maintenance = computeMaintenanceCost(company);
+                      const total = aprilRent + maintenance;
                       const contractStart = new Date(company.agreement_start_date);
                       const aprilDate = new Date(fyStartYear, 3, 1);
                       const contractEnd = new Date(company.agreement_end_date);
@@ -734,9 +738,19 @@ export default function RentalSheet({ companies, payments, deposits }: Props) {
                           {notActive ? (
                             <span className="text-slate-300 text-xs">—</span>
                           ) : (
-                            <div className="flex flex-col gap-1">
-                              <span className="text-base font-black text-emerald-700">{formatINR(aprilRent)}</span>
-                              <span className="text-[10px] text-emerald-600/70">/month</span>
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-base font-black text-emerald-700">{formatINR(total)}</span>
+                              <span className="text-[10px] text-emerald-600/70">/month total</span>
+                              <div className="mt-1 space-y-0.5 border-t border-emerald-100 pt-1">
+                                <div className="flex justify-between text-[10px] text-slate-500">
+                                  <span>Rent</span>
+                                  <span className="font-medium">{formatINR(aprilRent)}</span>
+                                </div>
+                                <div className="flex justify-between text-[10px] text-slate-500">
+                                  <span>Maintenance</span>
+                                  <span className="font-medium">{formatINR(maintenance)}</span>
+                                </div>
+                              </div>
                             </div>
                           )}
                         </td>
@@ -751,7 +765,7 @@ export default function RentalSheet({ companies, payments, deposits }: Props) {
                       const isFuture = mDate > now;
                       const isBeforeContract = mDate < contractStart || mDate > contractEnd;
 
-                      const totalDue = computeMonthlyRent(company, m.year, m.month);
+                      const totalDue = computeTotalMonthlyDue(company, m.year, m.month);
                       const payment = paymentMap.get(`${company.id}_${m.year}_${m.month}`);
 
                       return (

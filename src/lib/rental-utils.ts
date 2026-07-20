@@ -73,6 +73,27 @@ export function computeMonthlyRent(
 }
 
 /**
+ * Fixed monthly maintenance charge — does NOT increase annually.
+ * Formula: ₹1,000 base + ₹1,000 per 250 sq ft
+ */
+export function computeMaintenanceCost(company: Company): number {
+  if (company.mode_of_joining === 'online' || company.area_occupied <= 0) return 0;
+  const slabs = Math.ceil(company.area_occupied / 250);
+  return 1000 + slabs * 1000;
+}
+
+/**
+ * Total monthly amount due = rent (with 10% annual increase) + fixed maintenance.
+ */
+export function computeTotalMonthlyDue(
+  company: Company,
+  year: number,
+  month: number
+): number {
+  return computeMonthlyRent(company, year, month) + computeMaintenanceCost(company);
+}
+
+/**
  * Computes the security deposit amount for a company.
  * S1/S2: 2 months of base rent (no increase applied to deposit)
  * L1: ₹3000 per sq. ft.
